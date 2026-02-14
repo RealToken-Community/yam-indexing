@@ -12,6 +12,7 @@
 - [Configurable Application Parameters](#configurable-application-parameters)
 - [Optional Export of OfferAccepted Events](#optional-export-of-offeraccepted-events)
 - [Database Structure](#database-structure)
+- [Database Query Examples](#database-query-examples)
 - [Design Considerations](#design-considerations)
 - [Subgraph Requirements](#subgraph-requirements)
 
