@@ -1,0 +1,20 @@
+{
+  "name": "yam-events-tracker",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ yam-events-tracker",
+    "create-local": "graph create --node http://localhost:8020/ yam-events-tracker",
+    "remove-local": "graph remove --node http://localhost:8020/ yam-events-tracker",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 yam-events-tracker",
+    "test": "graph test"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-ts": "0.37.0"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.98.1",
+    "matchstick-as": "0.6.0"
+  }
+}

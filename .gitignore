@@ -1,0 +1,40 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+
+playground*.py
+
+# =========================
+# Virtual environments
+# =========================
+venv/
+.venv/
+env/
+.env/
+.env
+
+# =========================
+# Logs
+# =========================
+logs/*
+!logs/.gitkeep
+
+*.log
+*.log.*
+
+# =========================
+# Generated / build artifacts / node_modules
+# =========================
+the_graphe_handler/deployment/yam-events-tracker/generated/
+the_graphe_handler/deployment/yam-events-tracker/build/
+the_graphe_handler/deployment/yam-events-tracker/node_modules/
+
+
+# =========================
+# OS-specific
+# =========================
+.DS_Store
+Thumbs.db

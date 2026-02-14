@@ -1,0 +1,57 @@
+services:
+  yam-indexing-postgres:
+    image: ${DOCKER_REGISTRY}/yam-indexing-postgres:latest
+    container_name: ${DOCKER_BRANCH}-yam-indexing-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_READER_USER_PASSWORD: "${POSTGRES_READER_USER_PASSWORD}"
+      POSTGRES_WRITER_USER_PASSWORD: "${POSTGRES_WRITER_USER_PASSWORD}"
+      POSTGRES_EVENT_QUEUE_USER_PASSWORD: "${POSTGRES_EVENT_QUEUE_USER_PASSWORD}"
+    volumes:
+      - yam-indexing-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h localhost || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
+    networks:
+      - yam-events-db-shared-network
+
+  yam-indexing:
+    image: ${DOCKER_REGISTRY}/yam-indexing-indexer:latest
+    container_name: ${DOCKER_BRANCH}-yam-indexing-indexer
+    restart: unless-stopped
+    stop_grace_period: 20s
+    depends_on:
+      yam-indexing-postgres:
+        condition: service_healthy
+    environment:
+      YAM_INDEXING_W3_URLS: "${YAM_INDEXING_W3_URLS}"
+      YAM_INDEXING_THE_GRAPH_API_KEY: "${YAM_INDEXING_THE_GRAPH_API_KEY}"
+      YAM_INDEXING_SUBGRAPH_URL: "${YAM_INDEXING_SUBGRAPH_URL}"
+      TELEGRAM_ALERT_BOT_TOKEN: "${TELEGRAM_ALERT_BOT_TOKEN}"
+      TELEGRAM_ALERT_GROUP_ID: "${TELEGRAM_ALERT_GROUP_ID}"
+      POSTGRES_HOST: "yam-indexing-postgres"
+      POSTGRES_PORT: "${POSTGRES_PORT}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_READER_USER_PASSWORD: "${POSTGRES_READER_USER_PASSWORD}"
+      POSTGRES_WRITER_USER_PASSWORD: "${POSTGRES_WRITER_USER_PASSWORD}"
+      POSTGRES_EVENT_QUEUE_USER_PASSWORD: "${POSTGRES_EVENT_QUEUE_USER_PASSWORD}"
+    volumes:
+      - yam-indexing-logs:/app/logs
+    networks:
+      - yam-events-db-shared-network
+
+volumes:
+  yam-indexing-db:
+  yam-indexing-logs:
+
+networks:
+  yam-events-db-shared-network:
+    external: true

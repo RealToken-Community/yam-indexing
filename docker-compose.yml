@@ -1,0 +1,50 @@
+services:
+  yam-indexing-postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile-postgres
+    image: yam-postgres:16
+    container_name: yam-indexing-postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT_HOST:-${POSTGRES_PORT:-5432}}:5432"
+    volumes:
+      - yam-indexing-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yam-indexing-writer -d ${POSTGRES_DB} -h localhost || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
+    networks:
+      - yam-events-db-shared-network
+
+  yam-indexing:
+    build:
+      context: .
+      dockerfile: Dockerfile-indexer
+    image: yam-indexing-indexer
+    container_name: yam-indexing-indexer
+    env_file:
+      - .env
+    volumes:
+      - yam-indexing-logs:/app/logs
+    stop_grace_period: 20s
+    restart: unless-stopped
+
+    depends_on:
+      yam-indexing-postgres:
+        condition: service_healthy
+    networks:
+      - yam-events-db-shared-network
+
+volumes:
+  yam-indexing-db:
+  yam-indexing-logs:
+
+
+networks:
+  yam-events-db-shared-network:
+    external: true

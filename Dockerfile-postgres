@@ -1,0 +1,13 @@
+FROM postgres:16
+
+# envsubst is provided by gettext-base
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gettext-base \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy initialization SQL scripts into the directory
+# automatically executed by PostgreSQL on first startup
+COPY ./init_postgres/ /docker-entrypoint-initdb.d/
+
+# Set safe permissions on initialization scripts (this prevents accidental modification at runtime)
+RUN chmod -R 755 /docker-entrypoint-initdb.d

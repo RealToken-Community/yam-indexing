@@ -1,0 +1,51 @@
+type OfferCreated @entity(immutable: true) {
+  id: ID!
+  offerId: BigInt!
+  offerToken: Bytes!
+  buyerToken: Bytes!
+  seller: Bytes!
+  buyer: Bytes!
+  price: BigInt!
+  amount: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+type OfferAccepted @entity(immutable: true) {
+  id: ID!
+  offerId: BigInt!
+  offerToken: Bytes!
+  buyerToken: Bytes!
+  seller: Bytes!
+  buyer: Bytes!
+  price: BigInt!
+  amount: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+type OfferUpdated @entity(immutable: true) {
+  id: ID!
+  offerId: BigInt!
+  oldPrice: BigInt!
+  oldAmount: BigInt!
+  newPrice: BigInt!
+  newAmount: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+type OfferDeleted @entity(immutable: true) {
+  id: ID!
+  offerId: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
