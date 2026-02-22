@@ -322,7 +322,8 @@ Retrieve all the IDs offers of a seller address that are still available (not so
 ```sql
 SELECT offer_id
 FROM public.offers
-WHERE status = 'InProgress'
+WHERE seller_address = '0xADDRESS'
+  AND status = 'InProgress'
 ORDER BY offer_id;
 ```
 
