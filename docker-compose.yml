@@ -19,7 +19,7 @@ services:
       retries: 30
       start_period: 10s
     networks:
-      - yam-events-db-shared-network
+      - yam-graph
 
   yam-indexing:
     build:
@@ -33,18 +33,16 @@ services:
       - yam-indexing-logs:/app/logs
     stop_grace_period: 20s
     restart: unless-stopped
-
     depends_on:
       yam-indexing-postgres:
         condition: service_healthy
     networks:
-      - yam-events-db-shared-network
+      - yam-graph
 
 volumes:
   yam-indexing-db:
   yam-indexing-logs:
 
-
 networks:
-  yam-events-db-shared-network:
+  yam-graph:
     external: true
