@@ -19,7 +19,7 @@ services:
       retries: 30
       start_period: 10s
     networks:
-      - yam-events-db-shared-network
+      - yam-graph
 
   yam-indexing:
     image: ${DOCKER_REGISTRY}/yam-indexing-indexer:latest
@@ -46,12 +46,12 @@ services:
     volumes:
       - yam-indexing-logs:/app/logs
     networks:
-      - yam-events-db-shared-network
+      - yam-graph
 
 volumes:
   yam-indexing-db:
   yam-indexing-logs:
 
 networks:
-  yam-events-db-shared-network:
+  yam-graph:
     external: true
