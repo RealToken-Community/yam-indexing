@@ -191,7 +191,7 @@ The database is designed to persist all YAM offers, their full event history, an
 
 ### `offers`
 
-Stores the **state of every offer** ever created on the YAM contract.  
+Stores the **state of every offer** ever created on the YAM contract (`OfferCreated`).  
 Each row represents **one unique offer**, identified by its on-chain `offer_id`.
 
 **Purpose**
@@ -239,7 +239,7 @@ Each row corresponds to **one on-chain event** related to an offer.
 - `offer_id` (`BIGINT`, FK → `offers.offer_id`)  
   Offer concerned by the event
 - `event_type` (`TEXT`)  
-  Event type (`OfferCreated`, `OfferUpdated`, `OfferAccepted`, `OfferDeleted`)
+  Event type (`OfferUpdated`, `OfferAccepted`, `OfferDeleted`)
 - `amount` (`TEXT`, nullable)  
   Amount involved in the event (if applicable)
 - `price` (`TEXT`, nullable)  
