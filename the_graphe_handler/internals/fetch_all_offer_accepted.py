@@ -43,6 +43,9 @@ def fetch_all_offer_accepted(api_key: str, url: str, session: requests.Session =
     snapshot_block = meta.get("data", {}).get("_meta", {}).get("block", {}).get("number")
     if snapshot_block is None:
         raise ValueError("Could not read _meta.block.number from subgraph response.")
+    
+    # Subtract a small buffer from the snapshot block to ensure all indexers have processed it. Without this, indexers slightly behind the chain tip will return an error (missing block). 100 blocks ~ 500s on Gnosis Chain.
+    snapshot_block -= 100
 
     all_offers: List[Dict[str, Any]] = []
     batch_size = 1000
