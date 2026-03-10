@@ -2,7 +2,7 @@ import requests
 from typing import List, Dict, Any
 
 
-def fetch_all_offer_accepted(api_key: str, url: str) -> List[Dict[str, Any]]:
+def fetch_all_offer_accepted(api_key: str, url: str, session: requests.Session = None) -> List[Dict[str, Any]]:
     """
     Fetch all offerAccepted entities from The Graph subgraph with deterministic pagination.
 
@@ -24,6 +24,9 @@ def fetch_all_offer_accepted(api_key: str, url: str) -> List[Dict[str, Any]]:
             "https://gateway.thegraph.com/api/[api-key]/subgraphs/id/<deployment_id>"
         )
 
+    if session is None:
+        session = requests.Session()
+
     headers = {"Content-Type": "application/json"}
 
     # Freeze snapshot block
@@ -32,7 +35,7 @@ def fetch_all_offer_accepted(api_key: str, url: str) -> List[Dict[str, Any]]:
       _meta { block { number } }
     }
     """
-    response = requests.post(url, headers=headers, json={"query": meta_query}, timeout=30)
+    response = session.post(url, headers=headers, json={"query": meta_query}, timeout=30)
     response.raise_for_status()
     meta = response.json()
     if "errors" in meta:
@@ -76,7 +79,7 @@ def fetch_all_offer_accepted(api_key: str, url: str) -> List[Dict[str, Any]]:
             "variables": {"first": batch_size, "lastId": last_id, "block": snapshot_block},
         }
 
-        response = requests.post(url, headers=headers, json=payload, timeout=30)
+        response = session.post(url, headers=headers, json=payload, timeout=30)
         response.raise_for_status()
         data = response.json()
 
