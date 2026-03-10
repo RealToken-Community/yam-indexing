@@ -225,7 +225,7 @@ Each row represents **one unique offer**, identified by its on-chain `offer_id`.
 
 ### `offer_events`
 
-Stores **the full lifecycle of every offer**, including all state changes.  
+Stores **the full lifecycle of every offer**, including all state changes (`OfferUpdated`, `OfferAccepted`, `OfferDeleted`).  
 Each row corresponds to **one on-chain event** related to an offer.
 
 **Purpose**
