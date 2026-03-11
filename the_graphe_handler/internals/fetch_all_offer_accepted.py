@@ -1,5 +1,9 @@
 import requests
+import time
+import logging
 from typing import List, Dict, Any
+
+logger = logging.getLogger(__name__)
 
 
 def fetch_all_offer_accepted(api_key: str, url: str, session: requests.Session = None) -> List[Dict[str, Any]]:
@@ -29,21 +33,34 @@ def fetch_all_offer_accepted(api_key: str, url: str, session: requests.Session =
 
     headers = {"Content-Type": "application/json"}
 
+    # Wait times in seconds between retries (2min, 6min, 10min, 15min)
+    retry_delays = [120, 360, 600, 900]
+
     # Freeze snapshot block
     meta_query = """
     query {
       _meta { block { number } }
     }
     """
-    response = session.post(url, headers=headers, json={"query": meta_query}, timeout=30)
-    response.raise_for_status()
+    for attempt, delay in enumerate(retry_delays + [None]):
+        try:
+            response = session.post(url, headers=headers, json={"query": meta_query}, timeout=30)
+            response.raise_for_status()
+            break
+        except requests.exceptions.ConnectionError as e:
+            if delay is None:
+                raise
+            logger.warning(f"Connection error on _meta query (attempt {attempt + 1}), retrying in {delay // 60} min... ({e})")
+            time.sleep(delay)
+            session = requests.Session()  # reset the session to force a fresh TCP connection and DNS resolution
+
     meta = response.json()
     if "errors" in meta:
         raise ValueError(f"GraphQL errors: {meta['errors']}")
     snapshot_block = meta.get("data", {}).get("_meta", {}).get("block", {}).get("number")
     if snapshot_block is None:
         raise ValueError("Could not read _meta.block.number from subgraph response.")
-    
+
     # Subtract a small buffer from the snapshot block to ensure all indexers have processed it. Without this, indexers slightly behind the chain tip will return an error (missing block). 100 blocks ~ 500s on Gnosis Chain.
     snapshot_block -= 100
 
@@ -82,8 +99,18 @@ def fetch_all_offer_accepted(api_key: str, url: str, session: requests.Session =
             "variables": {"first": batch_size, "lastId": last_id, "block": snapshot_block},
         }
 
-        response = session.post(url, headers=headers, json=payload, timeout=30)
-        response.raise_for_status()
+        for attempt, delay in enumerate(retry_delays + [None]):
+            try:
+                response = session.post(url, headers=headers, json=payload, timeout=30)
+                response.raise_for_status()
+                break
+            except requests.exceptions.ConnectionError as e:
+                if delay is None:
+                    raise
+                logger.warning(f"Connection error on pagination query (attempt {attempt + 1}), retrying in {delay // 60} min... ({e})")
+                time.sleep(delay)
+                session = requests.Session()  # reset the session to force a fresh TCP connection and DNS resolution
+
         data = response.json()
 
         if "errors" in data:
