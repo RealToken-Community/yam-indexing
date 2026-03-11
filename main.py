@@ -221,7 +221,12 @@ if __name__ == "__main__":
         with conn.cursor() as cursor:
             cursor.execute("SELECT 1 FROM public.indexing_state LIMIT 1")
             if cursor.fetchone() is None:
-                fill_db_history()
+                try:
+                    fill_db_history()
+                    logger.info("History filling completed successfully")
+                except Exception as e:
+                    logger.exception(f"Error while filling DB history: {e}")
+                    send_telegram_alert(f"Application yam indexing: Error while filling DB history\n{e}")
             else:
                 logger.info("history already exists: skipping history filling")
     finally:
