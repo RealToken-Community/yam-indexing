@@ -11,6 +11,7 @@ from requests.exceptions import HTTPError, Timeout, ConnectionError
 from urllib.parse import urlparse
 import json
 import time
+import requests
 
 import logging
 logger = logging.getLogger(__name__)
@@ -322,9 +323,10 @@ def fill_db_history():
         # Fetch from TheGraph all offerAccepted/offerDeleted/offerUpdated and add them to the DB
         logger.info("step 4/4 : fetching offerAccepted, offerUpdated and offerDeleted from TheGraph")
         print("\nofferAccepted, offerUpdated and offerDeleted with TheGrpah:")
-        accepted_offers_the_graph = fetch_all_offer_accepted(API_KEY, SUBGRAPH_URL)
-        updated_offers_the_graph = fetch_all_offer_updated(API_KEY, SUBGRAPH_URL)
-        deleted_offers_the_graph = fetch_all_offer_deleted(API_KEY, SUBGRAPH_URL)
+        session = requests.Session() # Shared session across all TheGraph fetch functions to reuse the TCP connection
+        accepted_offers_the_graph = fetch_all_offer_accepted(API_KEY, SUBGRAPH_URL, session)
+        updated_offers_the_graph = fetch_all_offer_updated(API_KEY, SUBGRAPH_URL, session)
+        deleted_offers_the_graph = fetch_all_offer_deleted(API_KEY, SUBGRAPH_URL, session)
         latest_block_number = w3_1.eth.block_number
         created_offers_the_graph = fetch_offer_created_from_block_range(SUBGRAPH_URL, API_KEY, highest_block_number, latest_block_number)
         all_events_the_graph = created_offers_the_graph + accepted_offers_the_graph + updated_offers_the_graph + deleted_offers_the_graph
