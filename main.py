@@ -12,6 +12,7 @@ from app_logging.logging_config import setup_logging
 from app_logging.send_telegram_alert import send_telegram_alert
 from app_logging import shutdown
 from config import(
+    BLOCK_TIME,
     BLOCK_TO_RETRIEVE,
     COUNT_BEFORE_RESYNC,
     BLOCK_BUFFER,
@@ -199,7 +200,7 @@ def main_indexing():
             
             # Adjust sleep time accordingly - we don't want to deviate so we take the execution time into account
             execution_time = time.time() - start_time
-            time_to_sleep = max(0, BLOCK_TO_RETRIEVE * 5.4 - execution_time) # 5.4 because it seems to go too fast with 5 and it ends up fetching block that doesn't exist yet
+            time_to_sleep = max(0, BLOCK_TO_RETRIEVE * BLOCK_TIME - execution_time) # BLOCK_TIME is set slightly above theoretical value as using the exact theoretical time causes the fetcher to run too fast and attempt to retrieve blocks that do not exist yet
             
             
             # Sleep for the adjusted time
